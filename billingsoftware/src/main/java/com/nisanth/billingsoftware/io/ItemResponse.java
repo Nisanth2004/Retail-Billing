@@ -23,5 +23,6 @@ public class ItemResponse {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private Integer quantity;
+    private Integer minThreshold;
 
 }

@@ -22,3 +22,14 @@ export const fetchItems = async () => {
 export const updateItemStock = async (itemId, addedQuantity) => {
   return await axios.put(`${API_URL}/admin/items/${itemId}/stock?addedQuantity=${addedQuantity}`, {}, AUTH_HEADER);
 };
+<<<<<<< HEAD
+=======
+
+export const updateItemThreshold = async (itemId, minThreshold) => {
+  return await axios.put(
+    `${API_URL}/admin/items/${itemId}/threshold?minThreshold=${minThreshold}`,
+    {},
+    AUTH_HEADER 
+  );
+};
+>>>>>>> 4f943e9 (Update threshold)

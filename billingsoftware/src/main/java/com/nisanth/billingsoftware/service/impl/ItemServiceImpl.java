@@ -92,8 +92,17 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
         return convertToResponse(item);
     }
+    public ItemResponse updateItemThreshold(String itemId, Integer minThreshold) {
+        ItemEntity item = itemRepository.findByItemId(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
 
-    // ✅ Deduct stock after sale (order placed)
+        item.setMinThreshold(minThreshold);
+        ItemEntity updatedItem = itemRepository.save(item);
+
+        // ✅ Return proper response object instead of entity
+        return convertToResponse(updatedItem);
+    }
+
 
 
 
@@ -106,6 +115,7 @@ public class ItemServiceImpl implements ItemService {
                 .imgUrl(item.getImgUrl())
                 .categoryId(item.getCategory().getCategoryId())
                 .categoryName(item.getCategory().getName())
+                .minThreshold(item.getMinThreshold())
                 .quantity(item.getQuantity())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())

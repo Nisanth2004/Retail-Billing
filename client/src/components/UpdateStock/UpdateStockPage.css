@@ -152,3 +152,78 @@
 body {
   overflow-x: hidden;
 }
+<<<<<<< HEAD
+=======
+/* 🩸 Glowing "Low Stock" Badge Animation */
+.badge.bg-danger {
+  position: relative;
+  animation: glowPulse 1.6s infinite ease-in-out;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.4),
+                0 0 10px rgba(255, 0, 0, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7),
+                0 0 25px rgba(255, 0, 0, 0.6);
+    transform: scale(1.05);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 0, 0, 0.4),
+                0 0 10px rgba(255, 0, 0, 0.3);
+    transform: scale(1);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* 🟡 Threshold Section Styling */
+.threshold-section {
+  border-top: 1px dashed rgba(255, 193, 7, 0.3);
+  padding-top: 6px;
+  margin-top: 10px;
+}
+
+.threshold-section .form-label {
+  color: #ffc107;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* 🟢 Stock Update Section Styling */
+.stock-update-section {
+  border-top: 1px dashed rgba(25, 135, 84, 0.3);
+  padding-top: 6px;
+  margin-top: 10px;
+}
+
+.stock-update-section .form-label {
+  color: #28a745;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* Focus glow effects */
+.form-control.border-warning:focus {
+  box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+}
+
+.stock-update-section input:focus {
+  box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
+
+>>>>>>> 4f943e9 (Update threshold)

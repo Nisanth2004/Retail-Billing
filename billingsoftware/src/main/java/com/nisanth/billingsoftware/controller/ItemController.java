@@ -2,11 +2,13 @@ package com.nisanth.billingsoftware.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nisanth.billingsoftware.entity.ItemEntity;
 import com.nisanth.billingsoftware.io.ItemRequest;
 import com.nisanth.billingsoftware.io.ItemResponse;
 import com.nisanth.billingsoftware.service.impl.ItemServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,4 +51,18 @@ public class ItemController {
                                     @RequestParam int addedQuantity) {
         return itemService.addStock(itemId, addedQuantity);
     }
+
+    @PutMapping("/admin/items/{itemId}/threshold")
+    public ResponseEntity<ItemResponse> updateItemThreshold(
+            @PathVariable String itemId,
+            @RequestParam Integer minThreshold) {
+
+        ItemResponse updatedItem = itemService.updateItemThreshold(itemId, minThreshold);
+        return ResponseEntity.ok(updatedItem);
+    }
+
+
+
+
+
 }
