@@ -11,4 +11,9 @@ public interface ItemService {
 
    List<ItemResponse> fetchItems();
    void deleteItem(String itemId);
+
+
+
+    // ✅ Deduct stock after sale (order placed)
+    void updateStockAfterSale(String itemId, int soldQty);
 }

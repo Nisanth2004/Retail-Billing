@@ -45,4 +45,8 @@ public class ItemEntity {
     @JoinColumn(name="category_id",nullable = false)
     @OnDelete(action = OnDeleteAction.RESTRICT) // if item is deleted category should not be deleted
     private CategoryEntity category;
+
+
+    private Integer quantity; // ✅ stock in store
+    private Integer minThreshold = 5; // ✅ alert if below this
 }

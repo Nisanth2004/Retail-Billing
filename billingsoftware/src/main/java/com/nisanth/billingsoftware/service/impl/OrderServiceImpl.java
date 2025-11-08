@@ -4,6 +4,7 @@ import com.nisanth.billingsoftware.entity.OrderEntity;
 import com.nisanth.billingsoftware.entity.OrderItemEntity;
 import com.nisanth.billingsoftware.io.*;
 import com.nisanth.billingsoftware.repository.OrderEntityRepository;
+import com.nisanth.billingsoftware.service.ItemService;
 import com.nisanth.billingsoftware.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -19,30 +20,45 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderEntityRepository orderEntityRepository;
+    private final ItemService itemService;
     @Override
     public OrderResponse createOrder(OrderRequest request) {
 
-      OrderEntity newOrder= convertToOrderEntity(request);
+        // Step 1️⃣: Convert OrderRequest → OrderEntity
+        OrderEntity newOrder = convertToOrderEntity(request);
 
-      // create payment details
-        PaymentDetails paymentDetails=new PaymentDetails();
-        paymentDetails.setStatus(newOrder.getPaymentMethod() == PaymentMethod.CASH?
-                PaymentDetails.PaymentStatus.COMPLETED: PaymentDetails.PaymentStatus.PENDING
-                );
-
+        // Step 2️⃣: Create and attach payment details
+        PaymentDetails paymentDetails = new PaymentDetails();
+        paymentDetails.setStatus(
+                newOrder.getPaymentMethod() == PaymentMethod.CASH
+                        ? PaymentDetails.PaymentStatus.COMPLETED
+                        : PaymentDetails.PaymentStatus.PENDING
+        );
         newOrder.setPaymentDetails(paymentDetails);
-        List<OrderItemEntity> orderItems=request.getCartItems().stream()
+
+        // Step 3️⃣: Convert each cart item → OrderItemEntity
+        List<OrderItemEntity> orderItems = request.getCartItems()
+                .stream()
                 .map(this::convertToOrderItemEntity)
                 .collect(Collectors.toList());
 
         newOrder.setItems(orderItems);
 
+        // Step 4️⃣: Save the order first
         newOrder = orderEntityRepository.save(newOrder);
+
+        // Step 5️⃣: ✅ Deduct stock quantity for each sold product
+        for (OrderItemEntity orderItem : orderItems) {
+            itemService.updateStockAfterSale(
+                    orderItem.getItemId(),
+                    orderItem.getQuantity()
+            );
+        }
+
+        // Step 6️⃣: Return the response
         return convertToResponse(newOrder);
-
-
-
     }
+
     @Override
     public void deleteOrder(String orderId) {
 

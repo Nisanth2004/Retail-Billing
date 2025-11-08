@@ -25,60 +25,90 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final FileUploadService fileUploadService;
+
     @Override
     public ItemResponse add(ItemRequest request, MultipartFile file) {
-       String imgUrl= fileUploadService.uploadFile(file);
-       ItemEntity newItem=convertToEntity(request);
-       CategoryEntity existingCategory=categoryRepository.findByCategoryId(request.getCategoryId())
-               .orElseThrow(()->new RuntimeException("Caegory not found: "+request.getCategoryId()));
-       newItem.setCategory(existingCategory);
-       newItem.setImgUrl(imgUrl);
-       newItem=itemRepository.save(newItem);
-      return convertToResponse(newItem);
+        String imgUrl = fileUploadService.uploadFile(file);
 
+        CategoryEntity category = categoryRepository.findByCategoryId(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found: " + request.getCategoryId()));
 
+        ItemEntity item = ItemEntity.builder()
+                .itemId(UUID.randomUUID().toString())
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .quantity(request.getQuantity() != null ? request.getQuantity() : 10) // default stock
+                .category(category)
+                .imgUrl(imgUrl)
+                .build();
+
+        item = itemRepository.save(item);
+        return convertToResponse(item);
     }
 
     @Override
     public List<ItemResponse> fetchItems() {
-       return itemRepository.findAll()
-                .stream().map(item->convertToResponse(item))
+        return itemRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteItem(String itemId) {
-        ItemEntity existingItem=itemRepository.findByItemId(itemId)
-                .orElseThrow(()->new RuntimeException("Item not found: "+itemId));
-        boolean isFileDelete=fileUploadService.deletFile(existingItem.getImgUrl());
-        if(isFileDelete) {
+        ItemEntity existingItem = itemRepository.findByItemId(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found: " + itemId));
+
+        boolean deleted = fileUploadService.deletFile(existingItem.getImgUrl());
+        if (deleted) {
             itemRepository.delete(existingItem);
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Unable to delete the image");
+        } else {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to delete the image");
         }
     }
 
-    private ItemResponse convertToResponse(ItemEntity newItem) {
+    @Override
+    public void updateStockAfterSale(String itemId, int soldQty) {
+        ItemEntity item = itemRepository.findByItemId(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found: " + itemId));
+
+        if (item.getQuantity() < soldQty) {
+            throw new RuntimeException("Insufficient stock for item: " + item.getName());
+        }
+
+        item.setQuantity(item.getQuantity() - soldQty);
+        itemRepository.save(item);
+    }
+
+
+
+    // ✅ Add stock quantity manually (admin)
+    public ItemResponse addStock(String itemId, int addedQuantity) {
+        ItemEntity item = itemRepository.findByItemId(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found: " + itemId));
+
+        item.setQuantity(item.getQuantity() + addedQuantity);
+        itemRepository.save(item);
+        return convertToResponse(item);
+    }
+
+    // ✅ Deduct stock after sale (order placed)
+
+
+
+    private ItemResponse convertToResponse(ItemEntity item) {
         return ItemResponse.builder()
-                .itemId(newItem.getItemId())
-                .name(newItem.getName())
-                .description(newItem.getDescription())
-                .price(newItem.getPrice())
-                .imgUrl(newItem.getImgUrl())
-                .categoryName(newItem.getCategory().getName())
-                .categoryId(newItem.getCategory().getCategoryId())
-                .createdAt(newItem.getCreatedAt())
-                .updatedAt(newItem.getUpdatedAt())
-                .build();
-    }
-
-    private ItemEntity convertToEntity(ItemRequest request) {
-        return ItemEntity.builder()
-                .itemId(UUID.randomUUID().toString())
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
+                .itemId(item.getItemId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .price(item.getPrice())
+                .imgUrl(item.getImgUrl())
+                .categoryId(item.getCategory().getCategoryId())
+                .categoryName(item.getCategory().getName())
+                .quantity(item.getQuantity())
+                .createdAt(item.getCreatedAt())
+                .updatedAt(item.getUpdatedAt())
                 .build();
     }
 }
