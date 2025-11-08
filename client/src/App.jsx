@@ -1,79 +1,111 @@
-import React, { useContext } from 'react'
-import Menubar from './components/Menubar/Menubar'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import Dashboard from './pages/Dashboard/Dashboard'
-import ManageCategory from './pages/ManageCategory/ManageCategory'
-import ManageUsers from './pages/ManageUsers/ManageUsers'
-import ManageItems from './pages/ManageItems/ManageItems'
-import Explore from './pages/Explore/Explore'
-import { Toaster } from 'react-hot-toast';
-import Login from './pages/Login/Login'
-import OrderHistory from './pages/OrderHistory/OrderHistory'
-import { AppContext } from './context/AppContext'
-import { all } from 'axios'
-import Notfound from './pages/Notfound/Notfound'
-import UpdateStockPage from './components/UpdateStock/UpdateStockPage'
+import React, { useContext, Suspense, lazy } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+import { AppContext } from "./context/AppContext";
+import Menubar from "./components/Menubar/Menubar";
 
-
-
+// 🧠 Lazy load all major pages
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
+const ManageCategory = lazy(() => import("./pages/ManageCategory/ManageCategory"));
+const ManageUsers = lazy(() => import("./pages/ManageUsers/ManageUsers"));
+const ManageItems = lazy(() => import("./pages/ManageItems/ManageItems"));
+const Explore = lazy(() => import("./pages/Explore/Explore"));
+const Login = lazy(() => import("./pages/Login/Login"));
+const OrderHistory = lazy(() => import("./pages/OrderHistory/OrderHistory"));
+const Notfound = lazy(() => import("./pages/Notfound/Notfound"));
+const UpdateStockPage = lazy(() => import("./components/UpdateStock/UpdateStockPage"));
 
 const App = () => {
+  const location = useLocation();
+  const { auth } = useContext(AppContext);
 
- const location= useLocation();
+  // 🔐 Login Route Guard
+  const LoginRoute = ({ element }) => {
+    if (auth.token) return <Navigate to="/dashboard" replace />;
+    return element;
+  };
 
- const{auth}=useContext(AppContext);
+  // 🔐 Protected Route Guard
+  const ProtectedRoute = ({ element, allowedRoles }) => {
+    if (!auth.token) return <Navigate to="/login" replace />;
+    if (allowedRoles && !allowedRoles.includes(auth.role))
+      return <Navigate to="/dashboard" replace />;
+    return element;
+  };
 
- const LoginRoute=({element})=>{
-  if(auth.token)
-  {
-    return <Navigate to='/dashboard' replace/>
-  }
-
-  return element
- }
-
-
- const ProtectedRoute=({element,allowedRoles})=>{
-  if(!auth.token)
-  {
-    return <Navigate to='/login' replace/>
-  }
-
-  if(allowedRoles && !allowedRoles.includes(auth.role))
-  {
-    return <Navigate to='/dashboard' replace/>
-  }
-
-  return element;
- }
   return (
     <div>
-      {location.pathname!=="/login" && <Menubar/>}
-      <Toaster/>
-      <Routes>
-        <Route path='/dashboard' element={<Dashboard/>}/>
-        <Route path='/' element={<Dashboard/>}/>
-        <Route path='/explore' element={<Explore/>}/>
-        <Route path='/login' element={<LoginRoute element={<Login/>} />}/>
+      {location.pathname !== "/login" && <Menubar />}
+      <Toaster />
 
-        {/* Admin Only Routes */}
-        <Route path='/category' element={<ProtectedRoute element={<ManageCategory />} allowedRoles={['ROLE_ADMIN']}/>}/>
-        <Route path='/users' element={<ProtectedRoute element={<ManageUsers />} allowedRoles={['ROLE_ADMIN']}/> }/>
-        <Route path='/items' element={<ProtectedRoute element={<ManageItems />} allowedRoles={['ROLE_ADMIN']}/> }/>
-<Route
-  path="/update-stock"
-  element={<ProtectedRoute element={<UpdateStockPage />} allowedRoles={['ROLE_ADMIN']} />}
-/>
+      {/* 🌀 Suspense fallback while loading dynamically imported components */}
+      <Suspense
+        fallback={
+          <div
+            style={{
+              height: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#ffc107",
+              fontWeight: "bold",
+              fontSize: "1.2rem",
+            }}
+          >
+            Loading...
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/login" element={<LoginRoute element={<Login />} />} />
 
-      
-        <Route path='/orders' element={<OrderHistory/>}/>
+          {/* Admin Only Routes */}
+          <Route
+            path="/category"
+            element={
+              <ProtectedRoute
+                element={<ManageCategory />}
+                allowedRoles={["ROLE_ADMIN"]}
+              />
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute
+                element={<ManageUsers />}
+                allowedRoles={["ROLE_ADMIN"]}
+              />
+            }
+          />
+          <Route
+            path="/items"
+            element={
+              <ProtectedRoute
+                element={<ManageItems />}
+                allowedRoles={["ROLE_ADMIN"]}
+              />
+            }
+          />
+          <Route
+            path="/update-stock"
+            element={
+              <ProtectedRoute
+                element={<UpdateStockPage />}
+                allowedRoles={["ROLE_ADMIN"]}
+              />
+            }
+          />
 
-        <Route path='*' element={<Notfound/>}/>
-
-
-      </Routes>
+          <Route path="/orders" element={<OrderHistory />} />
+          <Route path="*" element={<Notfound />} />
+        </Routes>
+      </Suspense>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://retail-billing-dm1w.onrender.com';
 const AUTH_HEADER = {
   headers: {
     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -22,8 +22,7 @@ export const fetchItems = async () => {
 export const updateItemStock = async (itemId, addedQuantity) => {
   return await axios.put(`${API_URL}/admin/items/${itemId}/stock?addedQuantity=${addedQuantity}`, {}, AUTH_HEADER);
 };
-<<<<<<< HEAD
-=======
+
 
 export const updateItemThreshold = async (itemId, minThreshold) => {
   return await axios.put(
@@ -32,4 +31,4 @@ export const updateItemThreshold = async (itemId, minThreshold) => {
     AUTH_HEADER 
   );
 };
->>>>>>> 4f943e9 (Update threshold)
+

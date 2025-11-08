@@ -152,8 +152,6 @@
 body {
   overflow-x: hidden;
 }
-<<<<<<< HEAD
-=======
 /* 🩸 Glowing "Low Stock" Badge Animation */
 .badge.bg-danger {
   position: relative;
@@ -226,4 +224,3 @@ body {
   box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
 }
 
->>>>>>> 4f943e9 (Update threshold)

@@ -1,14 +1,9 @@
 import React, { useContext, useState, useMemo } from "react";
 import { AppContext } from "../../context/AppContext";
-<<<<<<< HEAD
-import UpdateStock from "./UpdateStock";
-import "./UpdateStockPage.css";
-=======
 import { updateItemThreshold } from "../../Service/ItemService";
 import UpdateStock from "./UpdateStock";
 import "./UpdateStockPage.css";
 import toast from "react-hot-toast";
->>>>>>> 4f943e9 (Update threshold)
 import {
   FaSearch,
   FaBoxOpen,
@@ -16,27 +11,17 @@ import {
   FaTimesCircle,
   FaChartPie,
   FaChartBar,
-<<<<<<< HEAD
-  FaRedoAlt,
-=======
   FaInfoCircle,
   FaSpinner,
->>>>>>> 4f943e9 (Update threshold)
 } from "react-icons/fa";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 const UpdateStockPage = () => {
-<<<<<<< HEAD
-  const { itemsData, categories } = useContext(AppContext);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
-=======
   const { itemsData, categories, setItemsData } = useContext(AppContext);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [thresholdInputs, setThresholdInputs] = useState({});
   const [loadingItemId, setLoadingItemId] = useState(null);
->>>>>>> 4f943e9 (Update threshold)
 
   // ✅ Filter items
   const filteredItems = useMemo(() => {
@@ -52,24 +37,16 @@ const UpdateStockPage = () => {
 
   // ✅ Stock analytics
   const totalItems = itemsData.length;
-<<<<<<< HEAD
-  const lowStockItems = itemsData.filter((i) => i.quantity <= 5 && i.quantity > 0);
-=======
   const lowStockItems = itemsData.filter(
     (i) => i.quantity <= i.minThreshold && i.quantity > 0
   );
->>>>>>> 4f943e9 (Update threshold)
   const outOfStockItems = itemsData.filter((i) => i.quantity === 0);
   const mostStocked = itemsData.reduce(
     (prev, curr) => (curr.quantity > (prev?.quantity || 0) ? curr : prev),
     null
   );
   const totalStockValue = itemsData.reduce(
-<<<<<<< HEAD
-    (sum, item) => sum + (item.quantity * (item.price || 0)),
-=======
     (sum, item) => sum + item.quantity * (item.price || 0),
->>>>>>> 4f943e9 (Update threshold)
     0
   );
 
@@ -84,12 +61,6 @@ const UpdateStockPage = () => {
     return data.filter((d) => d.value > 0);
   }, [itemsData, categories]);
 
-<<<<<<< HEAD
-  const COLORS = ["#FFBB28", "#FF8042", "#00C49F", "#0088FE", "#FF4B4B", "#A5A5A5"];
-
-  return (
-    <div className="update-stock-container border-container p-4">
-=======
   const COLORS = [
     "#FFBB28",
     "#FF8042",
@@ -142,16 +113,11 @@ const UpdateStockPage = () => {
         </span>
       </div>
 
->>>>>>> 4f943e9 (Update threshold)
       <div className="row gx-4">
         {/* Left Section */}
         <div className="col-md-9 border-end border-warning pe-4">
           {/* Search + Category Filter */}
           <div className="search-filter-bar d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-<<<<<<< HEAD
-            {/* Search Box */}
-=======
->>>>>>> 4f943e9 (Update threshold)
             <div className="search-box d-flex align-items-center flex-grow-1 me-3">
               <span className="search-icon">
                 <FaSearch />
@@ -165,10 +131,6 @@ const UpdateStockPage = () => {
               />
             </div>
 
-<<<<<<< HEAD
-            {/* Category Dropdown */}
-=======
->>>>>>> 4f943e9 (Update threshold)
             <select
               className="category-dropdown"
               value={selectedCategory}
@@ -193,23 +155,6 @@ const UpdateStockPage = () => {
                       src={item.imgUrl}
                       alt={item.name}
                       className="rounded-top"
-<<<<<<< HEAD
-                      style={{ width: "100%", height: "150px", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h6 className="fw-bold text-warning mb-1">{item.name}</h6>
-                      <p className="text-secondary small mb-1">
-                        {item.categoryName}
-                      </p>
-                      <p className="mb-2">
-                        Current Stock:{" "}
-                        <b
-                          className={
-                            item.quantity <= 5
-                              ? "text-danger"
-                              : item.quantity === 0
-                              ? "text-muted"
-=======
                       style={{
                         width: "100%",
                         height: "150px",
@@ -227,16 +172,10 @@ const UpdateStockPage = () => {
                           className={
                             item.quantity <= item.minThreshold
                               ? "text-danger"
->>>>>>> 4f943e9 (Update threshold)
                               : "text-success"
                           }
                         >
                           {item.quantity}
-<<<<<<< HEAD
-                        </b>
-                      </p>
-                      <UpdateStock itemId={item.itemId} />
-=======
                         </b>{" "}
                         <span className="text-secondary small">
                           (Threshold: {item.minThreshold})
@@ -288,7 +227,6 @@ const UpdateStockPage = () => {
                         </label>
                         <UpdateStock itemId={item.itemId} />
                       </div>
->>>>>>> 4f943e9 (Update threshold)
                     </div>
                   </div>
                 </div>
@@ -310,15 +248,6 @@ const UpdateStockPage = () => {
             </h5>
 
             <div className="stock-stats mb-4 small">
-<<<<<<< HEAD
-              <p><FaBoxOpen className="me-2 text-info" /> Total Categories: <b>{categories.length}</b></p>
-              <p><FaBoxOpen className="me-2 text-info" /> Total Items: <b>{totalItems}</b></p>
-              <p><FaExclamationTriangle className="me-2 text-warning" /> Low Stock: <b>{lowStockItems.length}</b></p>
-              <p><FaTimesCircle className="me-2 text-danger" /> Out of Stock: <b>{outOfStockItems.length}</b></p>
-              <p>💰 Total Value: <b>₹{totalStockValue.toLocaleString()}</b></p>
-              {mostStocked && (
-                <p>🏆 Top Item: <b>{mostStocked.name}</b> ({mostStocked.quantity})</p>
-=======
               <p>
                 <FaBoxOpen className="me-2 text-info" /> Total Categories:{" "}
                 <b>{categories.length}</b>
@@ -346,7 +275,6 @@ const UpdateStockPage = () => {
                     {mostStocked.name} ({mostStocked.quantity})
                   </b>
                 </p>
->>>>>>> 4f943e9 (Update threshold)
               )}
             </div>
 
