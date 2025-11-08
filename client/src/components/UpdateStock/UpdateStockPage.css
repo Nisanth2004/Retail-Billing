@@ -149,9 +149,7 @@
 }
 
 /* ✅ Remove global horizontal scrollbar */
-body {
-  overflow-x: hidden;
-}
+
 /* 🩸 Glowing "Low Stock" Badge Animation */
 .badge.bg-danger {
   position: relative;

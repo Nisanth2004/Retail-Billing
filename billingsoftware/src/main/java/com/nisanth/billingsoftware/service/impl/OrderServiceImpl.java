@@ -36,18 +36,22 @@ public class OrderServiceImpl implements OrderService {
         );
         newOrder.setPaymentDetails(paymentDetails);
 
-        // Step 3️⃣: Convert each cart item → OrderItemEntity
+        // Step 3️⃣: Convert each cart item → OrderItemEntity and set back-reference
         List<OrderItemEntity> orderItems = request.getCartItems()
                 .stream()
                 .map(this::convertToOrderItemEntity)
                 .collect(Collectors.toList());
 
+        // ✅ Important: set both sides of the relationship
+        for (OrderItemEntity item : orderItems) {
+            item.setOrder(newOrder); // set parent reference
+        }
         newOrder.setItems(orderItems);
 
-        // Step 4️⃣: Save the order first
+        // Step 4️⃣: Save order (cascade = ALL will handle items automatically)
         newOrder = orderEntityRepository.save(newOrder);
 
-        // Step 5️⃣: ✅ Deduct stock quantity for each sold product
+        // Step 5️⃣: Deduct stock quantity
         for (OrderItemEntity orderItem : orderItems) {
             itemService.updateStockAfterSale(
                     orderItem.getItemId(),
@@ -55,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
             );
         }
 
-        // Step 6️⃣: Return the response
+        // Step 6️⃣: Return response
         return convertToResponse(newOrder);
     }
 

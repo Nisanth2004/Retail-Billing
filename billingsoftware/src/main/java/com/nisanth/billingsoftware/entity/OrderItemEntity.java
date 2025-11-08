@@ -22,4 +22,8 @@ public class OrderItemEntity {
     private Double price;
     private Integer quantity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false)  // ✅ use same column name as in OrderEntity
+    private OrderEntity order;
+
 }

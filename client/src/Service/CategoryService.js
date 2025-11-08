@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://retail-billing-dm1w.onrender.com';
+const API_URL = 'http://localhost:8080';
 const token=localStorage.getItem('token')
 console.log(token)
 const AUTH_HEADER = {

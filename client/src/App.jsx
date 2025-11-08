@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AppContext } from "./context/AppContext";
 import Menubar from "./components/Menubar/Menubar";
+import StockPredictionPage from "./pages/StockPrediction/StockPredictionPage";
 
 // 🧠 Lazy load all major pages
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
@@ -99,6 +100,12 @@ const App = () => {
               />
             }
           />
+
+          <Route
+  path="/stock-predictions"
+  element={<ProtectedRoute element={<StockPredictionPage />} allowedRoles={['ROLE_ADMIN']} />}
+/>
+
 
           <Route path="/orders" element={<OrderHistory />} />
           <Route path="*" element={<Notfound />} />
