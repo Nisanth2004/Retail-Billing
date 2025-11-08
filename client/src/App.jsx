@@ -12,6 +12,10 @@ import OrderHistory from './pages/OrderHistory/OrderHistory'
 import { AppContext } from './context/AppContext'
 import { all } from 'axios'
 import Notfound from './pages/Notfound/Notfound'
+import UpdateStockPage from './components/UpdateStock/UpdateStockPage'
+
+
+
 
 const App = () => {
 
@@ -56,7 +60,11 @@ const App = () => {
         <Route path='/category' element={<ProtectedRoute element={<ManageCategory />} allowedRoles={['ROLE_ADMIN']}/>}/>
         <Route path='/users' element={<ProtectedRoute element={<ManageUsers />} allowedRoles={['ROLE_ADMIN']}/> }/>
         <Route path='/items' element={<ProtectedRoute element={<ManageItems />} allowedRoles={['ROLE_ADMIN']}/> }/>
-        
+<Route
+  path="/update-stock"
+  element={<ProtectedRoute element={<UpdateStockPage />} allowedRoles={['ROLE_ADMIN']} />}
+/>
+
       
         <Route path='/orders' element={<OrderHistory/>}/>
 

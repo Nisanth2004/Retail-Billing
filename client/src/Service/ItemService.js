@@ -18,3 +18,7 @@ export const deleteItems = async (itemId) => {
 export const fetchItems = async () => {
   return await axios.get(`${API_URL}/items`, AUTH_HEADER);
 };
+
+export const updateItemStock = async (itemId, addedQuantity) => {
+  return await axios.put(`${API_URL}/admin/items/${itemId}/stock?addedQuantity=${addedQuantity}`, {}, AUTH_HEADER);
+};

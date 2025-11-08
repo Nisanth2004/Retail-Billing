@@ -59,6 +59,14 @@ const Menubar = () => {
             <li className="nav-item">
                 <Link className={`nav-link ${isActive('/orders') ? 'fw-bold text-warning':''}`} to="/orders">Order History</Link>
             </li>
+            <li className="nav-item">
+  <Link
+    className={`nav-link ${isActive('/update-stock') ? 'fw-bold text-warning' : ''}`}
+    to="/update-stock"
+  >
+    Update Stock
+  </Link>
+</li>
         </ul>
       {/*} Add the dropdown for user profile */}
       <ul className="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">

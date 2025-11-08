@@ -135,6 +135,19 @@ const ItemForm = () => {
                                ></textarea>
                                
                     </div>
+                    <div className="mb-3">
+  <label htmlFor="quantity" className="form-label">Initial Stock</label>
+  <input
+    type="number"
+    name="quantity"
+    id="quantity"
+    className="form-control"
+    placeholder="Enter initial stock quantity"
+    onChange={onChangeHandler}
+    value={data.quantity}
+  />
+</div>
+
 
                   
 

@@ -1,0 +1,154 @@
+.update-stock-container {
+  background-color: #1e1e1e;
+  color: #f8f9fa;
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.15);
+  overflow-x: hidden; /* ✅ prevent unwanted horizontal scroll */
+}
+
+/* 🔍 Search + Filter Bar */
+.search-filter-bar {
+  background-color: #2a2a2a;
+  border: 1px solid #ffc107;
+  border-radius: 10px;
+  padding: 10px 15px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ✅ Search Box */
+.search-box {
+  background-color: #1f1f1f;
+  border: 2px solid #ffc107;
+  border-radius: 25px;
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  height: 42px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.search-box:hover,
+.search-box:focus-within {
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.35);
+}
+
+/* ✅ Rounded search icon */
+.search-icon {
+  background-color: #ffc107;
+  color: #1e1e1e;
+  width: 40px;
+  height: 40px;
+  margin-left: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.05rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-icon:hover {
+  background-color: #ffdb4d;
+  transform: scale(1.1);
+}
+
+/* Input Field */
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 0 25px 25px 0;
+}
+
+.search-input::placeholder {
+  color: #bfbfbf;
+  font-style: italic;
+}
+
+/* ✅ Category Dropdown */
+.category-dropdown {
+  background-color: #1f1f1f;
+  color: #ffc107;
+  border: 2px solid #ffc107;
+  border-radius: 25px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  outline: none;
+  height: 42px;
+  transition: all 0.3s ease;
+  min-width: 180px;
+}
+
+.category-dropdown:hover,
+.category-dropdown:focus {
+  background-color: #ffc107;
+  color: #1e1e1e;
+  font-weight: 600;
+}
+
+/* ✅ Scrollable Items (No horizontal scroll) */
+.scrollable-items {
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 70vh;
+  padding-right: 10px;
+  border-radius: 10px;
+}
+
+.scrollable-items::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollable-items::-webkit-scrollbar-thumb {
+  background: #ffc107;
+  border-radius: 10px;
+}
+
+.scrollable-items::-webkit-scrollbar-thumb:hover {
+  background: #ffdb4d;
+}
+
+.scrollable-items::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 10px;
+}
+
+/* ✅ Sticky Sidebar */
+.sticky-sidebar {
+  position: sticky;
+  top: 20px;
+}
+
+/* ✅ Card Hover Effects */
+.card {
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+}
+
+/* ✅ Remove global horizontal scrollbar */
+body {
+  overflow-x: hidden;
+}
