@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
@@ -28,61 +27,70 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final AppUserDetailsService appUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
 
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults())
+
+        http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth->
-                        auth.requestMatchers("/login","/encode").permitAll()
-                                .requestMatchers("/categories","/items","/orders","/payments","/dashboard","/predictions").hasAnyRole("USER","ADMIN")
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().authenticated())
-
-                .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/encode").permitAll()
+                        .requestMatchers("/categories", "/items", "/orders",
+                                "/payments", "/dashboard", "/predictions")
+                        .hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                // ⚠ Ensure CORS filter runs BEFORE security filters
+                .addFilterBefore(corsFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
-
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder()
-    {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-
     }
 
+    // ✔ Global CORS filter used by Security Chain
     @Bean
-    public CorsFilter corsFilter()
-    {
+    public CorsFilter corsFilter() {
         return new CorsFilter(corsConfigurationSource());
     }
 
-
     private UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config=new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:5173","https://hakun.netlify.app"));
-        config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization","Content-Type"));
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "https://hakun.netlify.app"
+        ));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source=new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**",config);
+        // ⭐ MUST allow all headers because axios sends more than 2
+        config.addAllowedHeader("*");
+
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
         return source;
-
-
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(){
-        DaoAuthenticationProvider authProvider=new DaoAuthenticationProvider();
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(appUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return new ProviderManager(authProvider);
-
     }
 }
