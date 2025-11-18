@@ -24,5 +24,9 @@ public class ItemResponse {
     private Timestamp updatedAt;
     private Integer quantity;
     private Integer minThreshold;
+    private BigDecimal gstRate;
+    private BigDecimal cgstRate;
+    private BigDecimal sgstRate;
+
 
 }

@@ -19,5 +19,9 @@ public class ItemRequest {
     private String categoryId;
     private String description;
     private Integer quantity;
+    private BigDecimal gstRate;
+    private BigDecimal cgstRate;
+    private BigDecimal sgstRate;
+
 
 }

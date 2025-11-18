@@ -47,6 +47,11 @@ public class ItemEntity {
     private CategoryEntity category;
 
 
-    private Integer quantity; // ✅ stock in store
-    private Integer minThreshold = 5; // ✅ alert if below this
+    private Integer quantity; //  stock in store
+    private Integer minThreshold = 5; //  alert if below this
+
+    private BigDecimal gstRate;
+    private BigDecimal cgstRate;
+    private BigDecimal sgstRate;
+
 }

@@ -34,6 +34,9 @@ const DisplayItems = ({selectedCategory}) => {
                  itemPrice={item.price}
                  itemImage={item.imgUrl}
                  itemId={item.itemId}
+                 gstRate={item.gstRate}
+  cgstRate={item.cgstRate}
+  sgstRate={item.sgstRate}
                    itemStock={item.quantity}  
               />
             </div>

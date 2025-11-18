@@ -27,7 +27,7 @@ const ItemsList = () => {
     }
   };
 
-  // 🧮 Helper function to determine stock status
+  // Helper function to determine stock status
   const getStockBadge = (quantity, threshold) => {
     const diff = quantity - threshold;
 

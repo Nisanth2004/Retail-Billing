@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,24 +29,40 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemResponse add(ItemRequest request, MultipartFile file) {
+
         String imgUrl = fileUploadService.uploadFile(file);
 
         CategoryEntity category = categoryRepository.findByCategoryId(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found: " + request.getCategoryId()));
+
+        // GST Auto-Split Logic
+        BigDecimal cgst = request.getCgstRate();
+        BigDecimal sgst = request.getSgstRate();
+
+        if (cgst == null || sgst == null) {
+            BigDecimal gst = request.getGstRate() != null ? request.getGstRate() : BigDecimal.ZERO;
+            BigDecimal half = gst.divide(BigDecimal.valueOf(2));
+            cgst = half;
+            sgst = half;
+        }
 
         ItemEntity item = ItemEntity.builder()
                 .itemId(UUID.randomUUID().toString())
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
-                .quantity(request.getQuantity() != null ? request.getQuantity() : 10) // default stock
+                .quantity(request.getQuantity() != null ? request.getQuantity() : 10)
                 .category(category)
+                .gstRate(request.getGstRate())        // keep old field
+                .cgstRate(cgst)
+                .sgstRate(sgst)
                 .imgUrl(imgUrl)
                 .build();
 
         item = itemRepository.save(item);
         return convertToResponse(item);
     }
+
 
     @Override
     public List<ItemResponse> fetchItems() {
@@ -117,6 +134,9 @@ public class ItemServiceImpl implements ItemService {
                 .categoryName(item.getCategory().getName())
                 .minThreshold(item.getMinThreshold())
                 .quantity(item.getQuantity())
+                .gstRate(item.getGstRate())
+                .cgstRate(item.getCgstRate())
+                .sgstRate(item.getSgstRate())
                 .createdAt(item.getCreatedAt())
                 .updatedAt(item.getUpdatedAt())
                 .build();

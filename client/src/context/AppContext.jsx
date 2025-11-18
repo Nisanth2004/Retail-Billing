@@ -1,3 +1,4 @@
+// src/context/AppContext.jsx
 import { createContext, useEffect, useState } from "react";
 import { fetchCategories } from "../Service/CategoryService";
 import { fetchItems } from "../Service/ItemService";
@@ -17,9 +18,12 @@ export const AppContextProvider = ({ children }) => {
   // Cart Functions
   // -----------------------------
   const addToCart = (item) => {
-    const existingItem = cartItems.find(
-      (cartItem) => cartItem.itemId === item.itemId
-    );
+    console.log(item)
+    const existingItem = cartItems.find((cartItem) => cartItem.itemId === item.itemId);
+
+    // Ensure numeric rates (defensive)
+    const cgstRate = item.cgstRate !== undefined ? Number(item.cgstRate) : 0;
+    const sgstRate = item.sgstRate !== undefined ? Number(item.sgstRate) : 0;
 
     if (existingItem) {
       setCartItems(
@@ -30,7 +34,15 @@ export const AppContextProvider = ({ children }) => {
         )
       );
     } else {
-      setCartItems([...cartItems, { ...item, quantity: 1 }]);
+      setCartItems([
+        ...cartItems,
+        {
+          ...item,
+          quantity: 1,
+          cgstRate,
+          sgstRate,
+        },
+      ]);
     }
   };
 
@@ -43,10 +55,13 @@ export const AppContextProvider = ({ children }) => {
   };
 
   const updateQuantity = (itemId, newQuantity) => {
+    if (newQuantity <= 0) {
+      // remove if zero or negative
+      removeFromCart(itemId);
+      return;
+    }
     setCartItems(
-      cartItems.map((item) =>
-        item.itemId === itemId ? { ...item, quantity: newQuantity } : item
-      )
+      cartItems.map((item) => (item.itemId === itemId ? { ...item, quantity: newQuantity } : item))
     );
   };
 
@@ -57,15 +72,14 @@ export const AppContextProvider = ({ children }) => {
     async function loadData() {
       try {
         if (localStorage.getItem("token") && localStorage.getItem("role")) {
-          setAuthData(
-            localStorage.getItem("token"),
-            localStorage.getItem("role")
-          );
+          setAuthData(localStorage.getItem("token"), localStorage.getItem("role"));
         }
 
         const response = await fetchCategories();
         const itemResponse = await fetchItems();
 
+        // If backend returns gst only, you can map to cgst/sgst here (optional).
+        // Assuming backend now returns cgstRate and sgstRate per item.
         setCategories(response.data);
         setItemsData(itemResponse.data);
       } catch (err) {
@@ -76,9 +90,8 @@ export const AppContextProvider = ({ children }) => {
     loadData();
   }, []);
 
-
   // -----------------------------
-  // Voice Recognition Integration (Improved with Fuzzy Matching)
+  // Voice Recognition Integration
   // -----------------------------
   const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
@@ -91,29 +104,18 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     if (transcript) {
       const spokenWord = transcript.toLowerCase().trim();
-      console.log("🎤 Voice detected:", spokenWord);
-
       const normalizedWord = aliasMap[spokenWord] || spokenWord;
 
-      let matchedItem = itemsData.find(
-        (it) => it.name.toLowerCase() === normalizedWord
-      );
+      let matchedItem = itemsData.find((it) => it.name.toLowerCase() === normalizedWord);
 
       if (!matchedItem) {
         const productNames = itemsData.map((it) => it.name.toLowerCase());
-        const match = stringSimilarity.findBestMatch(
-          normalizedWord,
-          productNames
-        );
+        const match = stringSimilarity.findBestMatch(normalizedWord, productNames);
 
         if (match.bestMatch.rating > 0.7) {
-          matchedItem = itemsData.find(
-            (it) => it.name.toLowerCase() === match.bestMatch.target
-          );
+          matchedItem = itemsData.find((it) => it.name.toLowerCase() === match.bestMatch.target);
         } else if (match.bestMatch.rating > 0.5) {
-          const possibleItem = itemsData.find(
-            (it) => it.name.toLowerCase() === match.bestMatch.target
-          );
+          const possibleItem = itemsData.find((it) => it.name.toLowerCase() === match.bestMatch.target);
           toast((t) => (
             <span>
               🎤 Did you mean <b>{possibleItem.name}</b>?
@@ -126,10 +128,7 @@ export const AppContextProvider = ({ children }) => {
               >
                 ✅ Yes
               </button>
-              <button
-                style={{ marginLeft: "5px", color: "red" }}
-                onClick={() => toast.dismiss(t.id)}
-              >
+              <button style={{ marginLeft: "5px", color: "red" }} onClick={() => toast.dismiss(t.id)}>
                 ❌ No
               </button>
             </span>
@@ -145,8 +144,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, [transcript, itemsData]);
 
-  const startListening = () =>
-    SpeechRecognition.startListening({ continuous: true });
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
   const stopListening = () => SpeechRecognition.stopListening();
 
   // -----------------------------
@@ -178,9 +176,5 @@ export const AppContextProvider = ({ children }) => {
     stopListening,
   };
 
-  return (
-    <AppContext.Provider value={contextvalue}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={contextvalue}>{children}</AppContext.Provider>;
 };
