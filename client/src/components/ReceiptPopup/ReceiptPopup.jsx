@@ -1,19 +1,28 @@
+// src/components/ReceiptPopup/ReceiptPopup.jsx
+
 import React, { useState } from "react";
 import "./ReceiptPopup.css";
 import "./Print.css";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { jsPDF } from "jspdf";
+import { calculateItemCGST, calculateItemSGST, calculateItemSubtotal } from "../../util/taxUtils";
+import { sendInvoiceSMS } from "../../Service/SmsService";
+
+
+
+
 
 const ReceiptPopup = ({ orderDetails, onClose, onPrint }) => {
   const [sending, setSending] = useState(false);
 
+  // Build SMS body using utility tax functions
   const buildSMSText = (od) => {
     const itemsText = od.items
       .map((it) => {
-        const sub = Number(it.price || 0) * Number(it.quantity || 0);
-        const cgstAmt = (sub * Number(it.cgstRate || 0)) / 100;
-        const sgstAmt = (sub * Number(it.sgstRate || 0)) / 100;
+        const sub = calculateItemSubtotal(it);
+        const cgstAmt = calculateItemCGST(it);
+        const sgstAmt = calculateItemSGST(it);
 
         return `${it.name} x${it.quantity} - ₹${sub.toFixed(2)} (CGST ₹${cgstAmt.toFixed(
           2
@@ -31,6 +40,7 @@ Grand Total: ₹${od.grandTotal.toFixed(2)}
 Thank you!`;
   };
 
+  // Generate PDF using utility tax functions
   const generatePDF = () => {
     const pdf = new jsPDF();
     pdf.setFontSize(18);
@@ -46,9 +56,9 @@ Thank you!`;
     let y = 78;
 
     orderDetails.items.forEach((it) => {
-      const sub = Number(it.price) * Number(it.quantity);
-      const cgstAmt = (sub * Number(it.cgstRate)) / 100;
-      const sgstAmt = (sub * Number(it.sgstRate)) / 100;
+      const sub = calculateItemSubtotal(it);
+      const cgstAmt = calculateItemCGST(it);
+      const sgstAmt = calculateItemSGST(it);
 
       const line = `${it.name} x${it.quantity} - ₹${sub.toFixed(
         2
@@ -99,11 +109,7 @@ Thank you!`;
         buildSMSText(orderDetails) +
         (fileUrl ? `\nDownload Invoice: ${fileUrl}` : "");
 
-      await axios.post(
-        "http://localhost:8080/admin/sms/send",
-        { phone: orderDetails.phoneNumber, message },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
+      await sendInvoiceSMS(orderDetails.phoneNumber, message);
 
       toast.success("Invoice sent via SMS!");
     } catch (err) {
@@ -134,17 +140,14 @@ Thank you!`;
 
         <div className="cart-items-scrollable">
           {orderDetails.items.map((item, index) => {
-            const price = Number(item.price) || 0;
-            const qty = Number(item.quantity) || 0;
-            const sub = price * qty;
-
-            const cgstAmt = (sub * Number(item.cgstRate)) / 100;
-            const sgstAmt = (sub * Number(item.sgstRate)) / 100;
+            const sub = calculateItemSubtotal(item);
+            const cgstAmt = calculateItemCGST(item);
+            const sgstAmt = calculateItemSGST(item);
 
             return (
               <div key={index} className="d-flex flex-column mb-2">
                 <div className="d-flex justify-content-between">
-                  <span>{item.name} × {qty}</span>
+                  <span>{item.name} × {item.quantity}</span>
                   <strong>₹{sub.toFixed(2)}</strong>
                 </div>
 

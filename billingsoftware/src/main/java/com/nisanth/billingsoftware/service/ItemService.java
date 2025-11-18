@@ -4,6 +4,7 @@ import com.nisanth.billingsoftware.io.ItemRequest;
 import com.nisanth.billingsoftware.io.ItemResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ItemService {
@@ -16,4 +17,6 @@ public interface ItemService {
 
     // ✅ Deduct stock after sale (order placed)
     void updateStockAfterSale(String itemId, int soldQty);
+
+    ItemResponse updateGstRates(String itemId, BigDecimal gstRate, BigDecimal cgstRate, BigDecimal sgstRate);
 }

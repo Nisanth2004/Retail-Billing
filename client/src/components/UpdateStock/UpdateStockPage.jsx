@@ -15,6 +15,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import UpdateGST from "./UpdateGST";
 
 const UpdateStockPage = () => {
   const { itemsData, categories, setItemsData } = useContext(AppContext);
@@ -227,6 +228,9 @@ const UpdateStockPage = () => {
                         </label>
                         <UpdateStock itemId={item.itemId} />
                       </div>
+
+                      <UpdateGST item={item} />
+
                     </div>
                   </div>
                 </div>

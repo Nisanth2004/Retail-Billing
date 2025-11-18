@@ -32,3 +32,12 @@ export const updateItemThreshold = async (itemId, minThreshold) => {
   );
 };
 
+
+export const updateItemGst = async (itemId, gstRate) => {
+  return await axios.put(
+    `${API_URL}/admin/items/${itemId}/gst?gstRate=${gstRate}`,
+    {},
+    AUTH_HEADER
+  );
+};
+

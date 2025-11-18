@@ -98,6 +98,25 @@ public class ItemServiceImpl implements ItemService {
         itemRepository.save(item);
     }
 
+    @Override
+    public ItemResponse updateGstRates(String itemId, BigDecimal gstRate, BigDecimal cgstRate, BigDecimal sgstRate) {
+        ItemEntity item = itemRepository.findByItemId(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found: " + itemId));
+
+        // Auto calculate CGST/SGST if not provided
+        if (cgstRate == null || sgstRate == null) {
+            BigDecimal half = gstRate.divide(BigDecimal.valueOf(2));
+            cgstRate = half;
+            sgstRate = half;
+        }
+
+        item.setGstRate(gstRate);
+        item.setCgstRate(cgstRate);
+        item.setSgstRate(sgstRate);
+
+        ItemEntity updated = itemRepository.save(item);
+        return convertToResponse(updated);
+    }
 
 
     // ✅ Add stock quantity manually (admin)

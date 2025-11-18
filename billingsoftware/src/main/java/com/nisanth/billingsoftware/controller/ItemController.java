@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -60,6 +62,18 @@ public class ItemController {
         ItemResponse updatedItem = itemService.updateItemThreshold(itemId, minThreshold);
         return ResponseEntity.ok(updatedItem);
     }
+
+    @PutMapping("/admin/items/{itemId}/gst")
+    public ResponseEntity<ItemResponse> updateGstRates(
+            @PathVariable String itemId,
+            @RequestParam BigDecimal gstRate,
+            @RequestParam(required = false) BigDecimal cgstRate,
+            @RequestParam(required = false) BigDecimal sgstRate
+    ) {
+        ItemResponse updatedItem = itemService.updateGstRates(itemId, gstRate, cgstRate, sgstRate);
+        return ResponseEntity.ok(updatedItem);
+    }
+
 
 
 
